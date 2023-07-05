@@ -1,10 +1,16 @@
 const express = require("express");
+const helmet = require("helmet");
 const fs = require("fs");
 const path = require("path");
 
 const PORT = 3000;
 const app = express();
 
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+  })
+);
 app.use(express.static(path.resolve(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -14,6 +20,11 @@ app.use(express.urlencoded({ extended: false }));
  * Setting the view templating engine
  */
 app.set("view engine", "ejs");
+/**
+ * https://expressjs.com/en/4x/api.html#app.set
+ * Setting the path to "views/" directory, used by template engine
+ */
+app.set("views", path.resolve(__dirname, "views"));
 
 /**
  * to use the res.render() method:
@@ -28,7 +39,7 @@ app.set("view engine", "ejs");
  * 5. Express uses node module for our specified view engine and parses the file
  */
 app.get("/", (req, res, next) => {
-  res.status(200).render(path.resolve(__dirname, "views", "hello.ejs"));
+  res.status(200).render("hello");
 });
 
 app.listen(PORT, () => {
