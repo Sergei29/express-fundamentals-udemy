@@ -19,7 +19,7 @@ app.set("view engine", "ejs");
 app.set("views", path.resolve(__dirname, "views"));
 
 app.get("/", (req, res, next) => {
-  res.status(200).render("hello");
+  res.status(200).render("hello", { user: { name: "Serge" } });
 });
 
 app.listen(PORT, () => {
