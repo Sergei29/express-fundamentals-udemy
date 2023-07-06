@@ -1,0 +1,10 @@
+<%- include('head') %> <%- include('navbar', {navLinks, url}) %>
+
+<div class="container-fluid">
+  <h1>Home page</h1>
+  <ul>
+    <% data && data.forEach((item, index)=>{ %>
+    <li>Hello <%= item %> !</li>
+    <%}) %>
+  </ul>
+</div>

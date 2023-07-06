@@ -1,0 +1,18 @@
+.container h1 {
+  color: red;
+}
+
+.notFound {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+.notFound img {
+  min-width: 500px;
+}
+
+img {
+  max-width: 200px;
+}
