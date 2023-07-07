@@ -1,6 +1,5 @@
 const express = require("express");
 const helmet = require("helmet");
-const fs = require("fs");
 const path = require("path");
 
 const PORT = 3000;
