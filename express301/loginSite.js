@@ -1,6 +1,7 @@
 const express = require("express");
 const helmet = require("helmet");
 const path = require("path");
+const fs = require("fs");
 const cookieParser = require("cookie-parser");
 
 const PORT = 3000;
@@ -26,6 +27,20 @@ app.use("/login", checkQueryMessages);
 
 app.set("view engine", "ejs");
 app.set("views", path.resolve(__dirname, "views"));
+
+/**
+ * @description `app.param(...) - will run BEFORE any endpoints handlers
+ * eg. may be useful to validate `storyId` param if it is used by multiple endpoints, before it arrives to any of these endpoints
+ */
+app.param("storyId", (req, res, next, storyId) => {
+  console.log("storyId :>> ", storyId);
+  /**
+   * query db if `storyId` exists, if NOT:
+   * res.status(404).send("Not found.");
+   * return;
+   */
+  next();
+});
 
 app.get("/", (req, res, next) => {
   if (!!req.cookies?.username) {
@@ -75,6 +90,59 @@ app.get("/story/:storyId/:title", (req, res, next) => {
   }
 
   res.render("story", { id: req.params.storyId, title: req.params.title });
+});
+
+app.get("/statement", (req, res, next) => {
+  /**
+   * @description this below 👇 will render the image in browser,
+   * but we want to download it instead
+   */
+  // res
+  //   .status(200)
+  //   .sendFile(
+  //     path.resolve(__dirname, "userStatements", "BankStatementChequing.png")
+  //   );
+  /**
+   * @description this below 👇 will also render the image in browser,
+   * but we want to download it instead
+   */
+  // const readable = fs.createReadStream(
+  //   path.resolve(__dirname, "userStatements", "BankStatementChequing.png")
+  // );
+  // res.status(200).set({
+  //   "Content-Type": "image/png",
+  // });
+  // readable.pipe(res);
+
+  /**
+   * @description  res has a `res.download(...)` method
+   */
+  // res.download(
+  //   path.resolve(__dirname, "userStatements", "BankStatementChequing.png"),
+  //   "JohnDoeStatement.png"
+  // );
+
+  const readable = fs.createReadStream(
+    path.resolve(__dirname, "userStatements", "BankStatementChequing.png")
+  );
+  res.status(200).set({
+    "Content-Type": "image/png",
+    "Content-Disposition": 'attachment; filename="JohnDoeStatement.png"',
+  });
+  readable.pipe(res);
+});
+
+app.get("/hello", (req, res, next) => {
+  res.json({ message: "OK" });
+
+  /**
+   * @description this is best way to remedy the common error
+   * `Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client`
+   * We verify first if headers have been sent - if not - then we can make a response.
+   */
+  if (!res.headersSent) {
+    res.send("Hello!");
+  }
 });
 
 app.post("/process_login", (req, res, next) => {
